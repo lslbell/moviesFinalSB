@@ -18,6 +18,7 @@ public class MovieServiceImpl implements MovieService {
     Logger logger = LoggerFactory.getLogger(MovieServiceImpl.class);
 
     private final MovieRepository movieRepository;
+
     private MovieTypeRepository movieTypeRepository;
 
     @Autowired
