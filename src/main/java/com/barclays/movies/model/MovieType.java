@@ -6,25 +6,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "MOVIE")
-public class Movie {
+@Table(name = "MOVIE_TYPE")
+public class MovieType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    private String title;
-    @NotBlank
-    private String isbn;
-    @ManyToOne
-    @JoinColumn(name="TYPE_ID")
-    private MovieType movieType;
+    @Column(name = "TYPE")
+    private String type;
+
+//    @Column(name = "Movie")
+//    @OneToMany(targetEntity =)
+//    List<Movie> movies = new ArrayList<>();
+
 
 }

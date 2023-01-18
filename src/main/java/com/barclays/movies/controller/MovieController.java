@@ -1,53 +1,50 @@
 package com.barclays.movies.controller;
 
 import com.barclays.movies.model.Movie;
+import com.barclays.movies.model.MovieType;
+import com.barclays.movies.repository.MovieTypeRepository;
 import com.barclays.movies.service.MovieService;
+import lombok.AllArgsConstructor;
+import org.h2.engine.Mode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/movie")
+@RequestMapping("/browseMovies")
 public class MovieController {
 
-    @Autowired
     MovieService movieService;
+    MovieTypeRepository movieTypeRepository;
+
+    @Autowired
+    public MovieController(MovieService movieService, MovieTypeRepository movieTypeRepository) {
+        this.movieService = movieService;
+        this.movieTypeRepository = movieTypeRepository;
+        }
 
     Logger logger = LoggerFactory.getLogger(MovieController.class);
+
+    @ModelAttribute("movieTypeList")
+    public List<MovieType> getMovieTypeList() {
+        return movieTypeRepository.findAll();
+    }
 
     @GetMapping
     public ModelAndView get() {
         ModelAndView modelAndView = new ModelAndView("movies");
 
-        Movie movie = movieService.findById(1L);
-
-        List<Movie> movies = new ArrayList<>();
-
-        Movie movie1 = new Movie();
-        movie1.setId(1L);
-        movie1.setTitle("Batman Begins");
-        movie1.setIsbn("XXX-XXXXX-XXX");
-        movies.add(movie1);
-
-        Movie movie2 = new Movie();
-        movie2.setId(2L);
-        movie2.setTitle("Batman: The Dark Knight");
-        movie2.setIsbn("XXX-XXXXX-XXX");
-        movies.add(movie2);
-
-        Movie movie3 = new Movie();
-        movie3.setId(3L);
-        movie3.setTitle("Batman: The Dark Knight Rises");
-        movie3.setIsbn("XXX-XXXXX-XXX");
-        movies.add(movie3);
+        List<Movie> movies = movieService.findAll();
 
         modelAndView.addObject("movies", movies);
 
@@ -56,10 +53,9 @@ public class MovieController {
 
     @GetMapping("/{id}")
     public ModelAndView get(@PathVariable Long id) {
-        Movie movie = new Movie();
-        movie.setId(id);
-//        movie.setTitle(id + "");
-//        movie.setIsbn(id + "");
+        //should add default movie if nullP...
+
+        Movie movie = movieService.findById(id);
 
         List<Movie> movies = new ArrayList<>();
         movies.add(movie);
@@ -70,14 +66,12 @@ public class MovieController {
         return modelAndView;
     }
 
-    @GetMapping("/add")
+    @GetMapping("/addMovie")
     public ModelAndView add() {
         ModelAndView modelAndView = new ModelAndView("addMovie");
 
-        Movie movie = new Movie();
-        movie.setId(4L);
-        movie.setTitle("Batman Begins");
-        movie.setIsbn("XXX-XXXXX-XXX");
+        Movie movie = movieService.findById(1L);
+
         modelAndView.addObject("movie", movie);
 
         return modelAndView;
@@ -86,6 +80,7 @@ public class MovieController {
     @PostMapping
     public ModelAndView post(@Valid @ModelAttribute Movie movie, BindingResult result) {
         logger.info("Entering post");
+
         ModelAndView modelAndView = new ModelAndView("poster");
 
         if (result.hasErrors()) {
@@ -103,6 +98,17 @@ public class MovieController {
         }
 
         logger.info("Exiting post");
+
+        return modelAndView;
+    }
+
+    @GetMapping("/edit")
+    public ModelAndView edit(@PathParam("id") Long id) {
+        Movie movie = movieService.findById(id);
+
+        ModelAndView modelAndView = new ModelAndView("addMovie");
+        modelAndView.addObject("movie", movie);
+
         return modelAndView;
     }
 
